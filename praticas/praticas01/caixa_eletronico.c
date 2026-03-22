@@ -1,45 +1,74 @@
 #include <stdio.h>
+#include <stdbool.h>
 
-// Função que calcula o total de notas para um saque e exibe o detalhamento
-int calcular_saque(int valor) {
-    if (valor < 0 || valor > 1000) {
-        return 0; // Saque inválido
+#define LIMITE_MAX 1000
+#define QTD_CEDULAS 7
+
+// Estrutura para organizar os dados das cédulas
+typedef struct {
+    int valor;
+    int quantidade;
+} Cedula;
+
+// Função principal de processamento
+int processarSaque(int valorSaque) {
+    // Validação inicial de limite
+    if (valorSaque > LIMITE_MAX || valorSaque <= 0) {
+        return 0;
     }
 
-    int notas[] = {200, 100, 50, 20, 10, 5, 2};
-    int total_notas = 0;
-    int resto = valor;
+    // Inicialização das cédulas disponíveis
+    Cedula caixa[] = {
+        {200, 0}, {100, 0}, {50, 0}, {20, 0}, {10, 0}, {5, 0}, {2, 0}
+    };
 
-    for (int i = 0; i < 7; i++) {
-        total_notas += resto / notas[i];
-        resto %= notas[i];
+    int restante = valorSaque;
+    int totalNotas = 0;
+
+    // Cálculo das notas
+    for (int i = 0; i < QTD_CEDULAS; i++) {
+        caixa[i].quantidade = restante / caixa[i].valor;
+        restante %= caixa[i].valor;
+        totalNotas += caixa[i].quantidade;
     }
 
-    // Se sobrou resto (ex: R$ 1 ou R$ 3), o saque não é possível com as notas atuais
-    if (resto > 0) return 0;
+    // Se houver resíduo (ex: R$ 1 ou R$ 3), o saque é inválido
+    if (restante > 0) {
+        return 0;
+    }
 
-    return total_notas;
+    // Se o saque for válido, imprime o detalhamento
+    printf("Detalhamento para R$ %d:\n", valorSaque);
+    for (int i = 0; i < QTD_CEDULAS; i++) {
+        if (caixa[i].quantidade > 0) {
+            printf("  -> %d nota(s) de R$ %d\n", caixa[i].quantidade, caixa[i].valor);
+        }
+    }
+
+    return totalNotas;
 }
 
 int main() {
-    int resultado;
-    printf("\n\n========== TESTES PARA  caixa_eletronico  ========\n\n");
+    // Casos de teste
+    int testes[] = {1200, 100, 277, 1000, 11};
+    int n = sizeof(testes) / sizeof(testes[0]);
 
-    // Caso 1 - Valor acima do limite
-    resultado = calcular_saque(1200);
-    printf("Saque=1200 Resultado= %d notas => Valido: %d\n", resultado, resultado != 0);
+    printf("========== TESTES PARA caixa_eletronico ==========\n\n");
 
-    // Caso 2 - Valor exato (uma nota)
-    resultado = calcular_saque(100);
-    printf("Saque=100  Resultado= %d notas => Correto: %d\n", resultado, resultado == 1);
+    for (int i = 0; i < n; i++) {
+        int valor = testes[i];
+        
+        // Executa a lógica e recebe o total de notas
+        int resultado = processarSaque(valor);
 
-    // Caso 3 - Valor composto (200 + 50 + 20 + 5 + 2)
-    resultado = calcular_saque(277);
-    printf("Saque=277  Resultado= %d notas => Correto: %d\n", resultado, resultado == 5);
-
-    // Caso 4 - Valor máximo permitido
-    resultado = calcular_saque(1000);
-    printf("Saque=1000 Resultado= %d notas => Correto: %d\n\n\n", resultado, resultado == 5);
+        // Formatação final conforme o padrão solicitado
+        if (resultado == 0) {
+            printf("Saque=%-5d Resultado= 0 notas => Valido: 0\n", valor);
+        } else {
+            printf("Saque=%-5d Resultado= %d notas => Correto: 1\n", valor, resultado);
+        }
+        printf("--------------------------------------------------\n");
+    }
 
     return 0;
 }
