@@ -12,7 +12,7 @@ int main()
     float alturas[] = {1.75, 1.75, 1.75, 1.75, 1.75, 0};
     int n = 6;
 
-    printf("Peso   Altura   IMC     Classificacao        Valido(0/1)\n");
+    printf("\n\nPeso   Altura   IMC     Classificacao        Valido(0/1)\n\n");
     printf("--------------------------------------------------------\n");
 
     for(int i = 0; i < n; i++)
