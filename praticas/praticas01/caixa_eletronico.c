@@ -1,73 +1,45 @@
 #include <stdio.h>
-#include <stdbool.h>
 
-#define LIMITE_MAX 1000
-#define QTD_CEDULAS 7
+void calcular_notas(int valor, int *n200, int *n100, int *n50,
+                   int *n20, int *n10, int *n5, int *n2) {
 
-// Estrutura para organizar os dados das cédulas
-typedef struct {
-    int valor;
-    int quantidade;
-} Cedula;
-
-// Função principal de processamento
-int processarSaque(int valorSaque) {
-    // Validação inicial de limite
-    if (valorSaque > LIMITE_MAX || valorSaque <= 0) {
-        return 0;
-    }
-
-    // Inicialização das cédulas disponíveis
-    Cedula caixa[] = {
-        {200, 0}, {100, 0}, {50, 0}, {20, 0}, {10, 0}, {5, 0}, {2, 0}
-    };
-
-    int restante = valorSaque;
-    int totalNotas = 0;
-
-    // Cálculo das notas
-    for (int i = 0; i < QTD_CEDULAS; i++) {
-        caixa[i].quantidade = restante / caixa[i].valor;
-        restante %= caixa[i].valor;
-        totalNotas += caixa[i].quantidade;
-    }
-
-    // Se houver resíduo (ex: R$ 1 ou R$ 3), o saque é inválido
-    if (restante > 0) {
-        return 0;
-    }
-
-    // Se o saque for válido, imprime o detalhamento
-    printf("Detalhamento para R$ %d:\n", valorSaque);
-    for (int i = 0; i < QTD_CEDULAS; i++) {
-        if (caixa[i].quantidade > 0) {
-            printf("  -> %d nota(s) de R$ %d\n", caixa[i].quantidade, caixa[i].valor);
-        }
-    }
-
-    return totalNotas;
+    *n200 = valor / 200; valor %= 200;
+    *n100 = valor / 100; valor %= 100;
+    *n50  = valor / 50;  valor %= 50;
+    *n20  = valor / 20;  valor %= 20;
+    *n10  = valor / 10;  valor %= 10;
+    *n5   = valor / 5;   valor %= 5;
+    *n2   = valor / 2;
 }
 
 int main() {
-    // Casos de teste
-    int testes[] = {1200, 100, 277, 1000, 11};
-    int n = sizeof(testes) / sizeof(testes[0]);
 
-    printf("========== TESTES PARA caixa_eletronico ==========\n\n");
+    printf("\nValor  200 100  50  20  10   5   2  Total  Valido(0/1)\n");
+    printf("------------------------------------------------------------------\n");
 
-    for (int i = 0; i < n; i++) {
-        int valor = testes[i];
-        
-        // Executa a lógica e recebe o total de notas
-        int resultado = processarSaque(valor);
+    int valores[] = {60, 186, 388, 576, -70, 101, 1200, 1350, 1000, 422, 15, 55};
+    int tamanho = 12;
 
-        // Formatação final conforme o padrão solicitado
-        if (resultado == 0) {
-            printf("Saque=%-5d Resultado= 0 notas => Valido: 0\n", valor);
+    for(int i = 0; i < tamanho; i++) {
+
+        int valor = valores[i];
+        int n200=0,n100=0,n50=0,n20=0,n10=0,n5=0,n2=0;
+        int total_notas = 0;
+        int valido = 1;
+
+        if(valor <= 0 || valor > 1000 || valor % 2 != 0) {
+            valido = 0;
+
+            printf("%5d   --- --- --- --- --- --- ---  -----     %d\n", valor, valido);
         } else {
-            printf("Saque=%-5d Resultado= %d notas => Correto: 1\n", valor, resultado);
+
+            calcular_notas(valor, &n200, &n100, &n50, &n20, &n10, &n5, &n2);
+
+            total_notas = n200 + n100 + n50 + n20 + n10 + n5 + n2;
+
+            printf("%5d   %3d %3d %3d %3d %3d %3d %3d  %5d     %d\n",
+                   valor, n200, n100, n50, n20, n10, n5, n2, total_notas, valido);
         }
-        printf("--------------------------------------------------\n");
     }
 
     return 0;
